@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace PlumTask.Creators
@@ -40,59 +41,77 @@ namespace PlumTask.Creators
         {
             Grid grid = new Grid();
 
-            // Додаємо 3 стовпці
             for (int i = 0; i < 3; i++)
             {
                 grid.ColumnDefinitions.Add(new ColumnDefinition());
             }
 
-            // Створюємо Canvas для кожного стовпця з маргіном
             for (int i = 0; i < 3; i++)
             {
-                Canvas canvas = new Canvas();
-
-                // Задаємо заливку в форматі хекса
-                canvas.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#182533")); // Колір фону
-
-                // Задаємо маргін для Canvas
-                canvas.Margin = new Thickness(i == 0 ? 0 : 10, 0, i == 2 ? 0 : 10, 0); // Маргін тільки між стовпцями
-
-                // Додаємо Canvas в Grid (ставимо його в потрібну колонку)
-                Grid.SetColumn(canvas, i);
-
-                // Обробник даблкліка по Canvas
-                canvas.MouseWheel += (sender, e) =>
+                StackPanel columnPanel = new StackPanel
                 {
-                    CreateCardOnCanvas((Canvas)sender);
+                    Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#182533")),
+                    Margin = new Thickness(i == 0 ? 0 : 10, 0, i == 2 ? 0 : 10, 0),
+                    AllowDrop = true 
                 };
 
-                // Додаємо Canvas в Grid
-                grid.Children.Add(canvas);
+                columnPanel.Drop += ColumnPanel_Drop;
+                columnPanel.DragOver += ColumnPanel_DragOver;
+
+                Grid.SetColumn(columnPanel, i);
+                grid.Children.Add(columnPanel);
+
+                for (int j = 0; j < 2; j++)
+                {
+                    Button card = new Button
+                    {
+                        Height = 100,
+                        Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2b5278")),
+                        Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#fdfdfd")),
+                        Content = $"Картка {i + 1}.{j + 1}",
+                        Margin = new Thickness(10),
+                        BorderThickness = new Thickness(0),
+                    };
+
+                    card.PreviewMouseMove += Card_PreviewMouseMove;
+                    columnPanel.Children.Add(card);
+                }
             }
 
             return grid;
         }
 
-        private static void CreateCardOnCanvas(Canvas canvas)
+        private static void Card_PreviewMouseMove(object sender, MouseEventArgs e)
         {
-            // Створюємо нову карточку
-            Border card = new Border
+            if (e.LeftButton == MouseButtonState.Pressed)
             {
-                Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF6347")), // Томатний колір (замінити за потреби)
-                Width = canvas.ActualWidth * 0.9, // Карточка займає 90% ширини Canvas
-                Height = 100, // Висота карточки
-                Margin = new Thickness(0),
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-            };
-
-            // Обчислюємо центр для вирівнювання
-            double left = (canvas.ActualWidth - card.Width) / 2;
-
-            // Додаємо карточку на Canvas
-            canvas.Children.Add(card);
-            Canvas.SetLeft(card, left); // Вирівнюємо по центру
+                Button card = (Button)sender;
+                DragDrop.DoDragDrop(card, card, DragDropEffects.Move);
+            }
         }
+
+        private static void ColumnPanel_DragOver(object sender, DragEventArgs e)
+        {
+            e.Effects = DragDropEffects.Move;
+        }
+
+        private static void ColumnPanel_Drop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetData(typeof(Button)) is Button card)
+            {
+                StackPanel targetPanel = (StackPanel)sender;
+                StackPanel sourcePanel = (StackPanel)card.Parent;
+
+                if (targetPanel != sourcePanel)
+                {
+                    sourcePanel.Children.Remove(card);
+                    targetPanel.Children.Add(card);
+                }
+            }
+        }
+
+
+
 
 
 
