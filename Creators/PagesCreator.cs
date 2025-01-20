@@ -1,4 +1,6 @@
-﻿using System;
+﻿using PlumTask.PageFunctions;
+using PlumTask.Pages;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,9 +16,14 @@ namespace PlumTask.Creators
 
         private static void PageFabric()
         {
-            CreatePage("Home", GridCreators.CreateHomeGrid());
-            CreatePage("Project", GridCreators.CreateProjectGrid());
-            CreatePage("Schedule", GridCreators.CreateScheduleGrid());
+            CreatePage("Home", GridCreators.CreateHomeGrid()); // Legacy
+            CreatePage("Project", GridCreators.CreateProjectGrid()); // Legacy
+            CreatePage("Schedule", GridCreators.CreateScheduleGrid()); // Legacy
+
+
+            ProjectPage projectPage = new ProjectPage();
+            CreatePage("2roject", projectPage.Create()); // NEW
+            
         }
 
 

@@ -24,6 +24,11 @@ namespace PlumTask
         }
 
 
+        public MainWindow GetMainWindow() 
+        {
+            return this;
+        }
+
     }
 }
  

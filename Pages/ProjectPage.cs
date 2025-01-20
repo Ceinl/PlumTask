@@ -1,51 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
+﻿using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows;
+using System.Windows.Input;
+using PlumTask.PageFunctions;
+using PlumTask.UI_elements;
+using System.Windows.Controls.Primitives;
 
-namespace PlumTask.Creators
+namespace PlumTask.Pages
 {
-    internal static class GridCreators
+    internal class ProjectPage
     {
-        public static Grid CreateHomeGrid()
+
+        private static Grid windowGrid;
+
+        public Grid Create()
         {
-            Grid grid = new Grid();
+            windowGrid = new Grid();
 
             for (int i = 0; i < 3; i++)
             {
-                grid.RowDefinitions.Add(new RowDefinition());
-                grid.ColumnDefinitions.Add(new ColumnDefinition());
-            }
-
-            TextBlock textBlock = new TextBlock();
-            textBlock.Text = DateTime.Now.ToString("yyyy-MM-dd"); 
-            textBlock.HorizontalAlignment = HorizontalAlignment.Center;
-            textBlock.VerticalAlignment = VerticalAlignment.Center;
-            textBlock.Foreground = new SolidColorBrush(Color.FromArgb(0xFF, 0xFD, 0xFD, 0xFD));
-            textBlock.FontSize = 16;
-            textBlock.FontWeight = FontWeights.Bold;
-
-            Grid.SetRow(textBlock, 1);
-            Grid.SetColumn(textBlock, 1);
-            grid.Children.Add(textBlock);
-
-            return grid;
-        }
-
-        /* --------------------- --------------------- --------------------- --------------------- */
-
-        public static Grid CreateProjectGrid()
-        {
-            Grid grid = new Grid();
-
-            for (int i = 0; i < 3; i++)
-            {
-                grid.ColumnDefinitions.Add(new ColumnDefinition());
+                windowGrid.ColumnDefinitions.Add(new ColumnDefinition());
             }
 
             for (int i = 0; i < 3; i++)
@@ -54,14 +28,17 @@ namespace PlumTask.Creators
                 {
                     Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#182533")),
                     Margin = new Thickness(i == 0 ? 0 : 10, 0, i == 2 ? 0 : 10, 0),
-                    AllowDrop = true 
+                    AllowDrop = true
                 };
 
                 columnPanel.Drop += ColumnPanel_Drop;
                 columnPanel.DragOver += ColumnPanel_DragOver;
+                
+                columnPanel.MouseLeftButtonDown += ColumnDoubleClickEvent;
 
                 Grid.SetColumn(columnPanel, i);
-                grid.Children.Add(columnPanel);
+                windowGrid.Children.Add(columnPanel);
+
 
                 for (int j = 0; j < 2; j++)
                 {
@@ -73,6 +50,7 @@ namespace PlumTask.Creators
                         Content = $"Картка {i + 1}.{j + 1}",
                         Margin = new Thickness(10),
                         BorderThickness = new Thickness(0),
+                        Tag = i
                     };
 
                     card.PreviewMouseMove += Card_PreviewMouseMove;
@@ -80,8 +58,35 @@ namespace PlumTask.Creators
                 }
             }
 
-            return grid;
+            return windowGrid;
         }
+
+
+
+        private static void ColumnDoubleClickEvent(object sender, MouseButtonEventArgs e)
+        {
+            string cardTitle = "Card";
+
+            var createCardPopup = new CreateCardPopup(); 
+
+            var popup = new Popup
+            {
+                Child = createCardPopup,  
+                IsOpen = true,
+                StaysOpen = false, 
+                 PlacementTarget = (UIElement)windowGrid,  
+                Placement = PlacementMode.Center,  
+                AllowsTransparency = true,  
+                HorizontalOffset = 0, 
+                VerticalOffset = 0,
+                Width = 400,
+                Height = 450
+
+            };
+
+            CardManager.AddCard((StackPanel)sender, cardTitle);
+        }
+
 
         private static void Card_PreviewMouseMove(object sender, MouseEventArgs e)
         {
@@ -111,16 +116,5 @@ namespace PlumTask.Creators
                 }
             }
         }
-
-        /* --------------------- --------------------- --------------------- --------------------- */
-
-        public static Grid CreateScheduleGrid() 
-        {
-            return new Grid();
-        }
-
-
     }
 }
-
-
