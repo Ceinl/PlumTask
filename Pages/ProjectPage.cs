@@ -11,6 +11,8 @@ namespace PlumTask.Pages
     internal class ProjectPage
     {
 
+        public static string cardcontent = "new card";
+
         private static Grid windowGrid;
 
         public Grid Create()
@@ -65,8 +67,6 @@ namespace PlumTask.Pages
 
         private static void ColumnDoubleClickEvent(object sender, MouseButtonEventArgs e)
         {
-            string cardTitle = "Card";
-
             var createCardPopup = new CreateCardPopup(); 
 
             var popup = new Popup
@@ -84,7 +84,7 @@ namespace PlumTask.Pages
 
             };
 
-            CardManager.AddCard((StackPanel)sender, cardTitle);
+            CardManager.AddCard((StackPanel)sender, cardcontent);
         }
 
 

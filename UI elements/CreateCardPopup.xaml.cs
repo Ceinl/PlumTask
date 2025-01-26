@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PlumTask.Pages;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -37,7 +38,14 @@ namespace PlumTask.UI_elements
             }
         }
 
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            ProjectPage.cardcontent = Title.Text; 
 
-
+            if (Parent is Popup popup)
+            {
+                popup.IsOpen = false;
+            }
+        }
     }
 }
